@@ -1,0 +1,17 @@
+{
+	"name": "myApp",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@dcloudio/uni-app": "^2.0.2-4050620250311002",
+		"@dcloudio/uni-ui": "^1.5.7",
+		"@rollup/plugin-inject": "^5.0.5",
+		"vue": "^3.5.13"
+	}
+}
