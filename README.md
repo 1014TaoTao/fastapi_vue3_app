@@ -1,6 +1,6 @@
 <div align="center">
    <p align="center">
-      <img src="./frontend/static/logo.png" height="150" alt="logo"/>
+      <img src="./frontend/src/static//logo.png" height="150" alt="logo"/>
    </p>
    <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Fastapi_Vue3_App</h1>
    <h4 align="center">基于Fastapi-Vue3-App前后端分离的快速移动、小程序和H5应用开发框架</h4>
