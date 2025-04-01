@@ -35,9 +35,9 @@ class BaseSchema(SQLModel):
 class Response(SQLModel):
     """响应模型"""
 
-    code: int = 200
-    message: str = ""
-    data: Any = None
+    code: int
+    message: str
+    data: Any
 
 
 class Page(SQLModel):
@@ -67,12 +67,6 @@ class JWTOutSchema(SQLModel):
     user_id: int | None = Field(description="用户ID")
 
 
-class LogoutPayloadSchema(SQLModel):
-    """退出登录载荷模型"""
-
-    token: str = Field(default=..., min_length=1, description="token")
-
-
 class ForgotPasswordSchema(SQLModel):
     """忘记密码模型"""
 
@@ -90,23 +84,23 @@ class RegisterSchema(SQLModel):
     password: str = Field(default=..., description="密码")
 
 
-class BaseUserOut(SQLModel):
-    """用户基础模型"""
+class LogoutSchema(SQLModel):
+    """退出登录模型"""
+    token: str = Field(default=..., description="token")
+
+
+class UserSchema(SQLModel):
+    """用户模型"""
 
     name: str | None = Field(default=None, description="用户名")
     username: str | None = Field(default=None, description="登录账号")
-    disabled: bool | None = Field(default=False, description="是否禁用")
-    description: str | None = Field(default=None, description="用户描述信息")
-    parent_id: int | None = Field(default=None, description="上级用户ID")
-
-
-class UserSchema(BaseUserOut):
-    """用户模型"""
-
     password: str = Field(default=None, max_length=255, description="密码")
+    disabled: bool | None = Field(default=False, description="是否禁用")
+    avatar: str | None = Field(default=None, description="头像")
+    description: str | None = Field(default=None, description="用户描述信息")
 
 
-class User2Schema(BaseSchema, BaseUserOut):
+class UserOutSchema(BaseSchema, UserSchema):
     """用户返回模型"""
 
     ...

@@ -1,0 +1,71 @@
+{
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			// uni-ui 规则如下配置
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+		}
+	},
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+
+			}
+		},
+		{
+			"path": "pages/login/forget",
+			"style": {
+				"navigationBarTitleText": "忘记密码"
+
+			}
+		},
+		{
+			"path": "pages/login/register",
+			"style": {
+				"navigationBarTitleText": "注册"
+
+			}
+		},
+		{
+			"path": "pages/me/me",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path" : "pages/home/home",
+			"style" : 
+			{
+				"navigationBarTitleText" : "首页"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",// 导航栏字体颜色
+		"navigationBarTitleText": "用户信息管理系统",// 导航蓝字体内容
+		"navigationBarBackgroundColor": "#F8F8F8",//导航蓝背景颜色
+		"backgroundColor": "#F8F8F8",// 下拉刷新区背景颜色
+		"enablePullDownRefresh": true // 下拉刷新
+	},
+	"tabBar": {
+		"color": "#999",
+		"selectedColor": "#dd524d",
+		"list": [
+			{
+				"pagePath": "pages/home/home",
+				"text": "首页",
+				"iconPath": "/static/home.png",
+				"selectedIconPath": "/static/select-home.png"
+			},
+			{
+				"pagePath": "pages/me/me",
+				"text": "我的",
+				"iconPath": "/static/mine.png",
+				"selectedIconPath": "/static/select-mine.png"
+			}
+		]
+	},
+	"uniIdRouter": {}
+}

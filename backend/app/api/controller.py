@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-
 import json
-from fastapi import Query, Request, APIRouter, Depends, Path
+import mimetypes
+from pathlib import Path
+import aiofiles
+from fastapi import File, Query, Request, APIRouter, Depends, Path, Body, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, desc, func, select, asc, and_
@@ -12,14 +14,14 @@ from datetime import datetime, timedelta
 
 from app.api.model import User
 from app.api.schema import (
+    LogoutSchema,
     RegisterSchema,
     ForgotPasswordSchema,
     JWTPayloadSchema,
     JWTOutSchema,
     Page,
-    LogoutPayloadSchema,
     UserSchema,
-    User2Schema,
+    UserOutSchema,
 )
 from app.core.security import (
     create_access_token,
@@ -29,11 +31,12 @@ from app.core.security import (
 )
 from app.core.config import settings
 from app.core.dependencies import get_current_user
-from app.core.database import get_db
-from app.core.logger import logger
+from app.core.log import logger
 from app.core.response import ExceptResponse, ErrorResponse, SuccessResponse
+from app.core.database import get_db
 
-router: APIRouter = APIRouter()
+
+router: APIRouter = APIRouter(prefix="/api")
 
 @router.post(path="/login", summary="登录", response_model=JWTOutSchema)
 async def login(
@@ -125,8 +128,7 @@ async def forgot_password(
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-
-@router.post(path="/register", summary="注册用户")
+@router.post(path="/register", summary="注册用户", response_model=UserOutSchema)
 async def register(
     payload: RegisterSchema,
     db: Session = Depends(dependency=get_db),
@@ -148,7 +150,7 @@ async def register(
 
         logger.info(f"账号 {payload.username} 注册成功")
 
-        return SuccessResponse(data=User2Schema.model_validate(obj_db).model_dump())
+        return SuccessResponse(data=UserOutSchema.model_validate(obj_db).model_dump())
     except Exception as e:
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
@@ -156,7 +158,7 @@ async def register(
 @router.post(path="/logout", summary="退出登录", dependencies=[Depends(dependency=get_current_user)])
 async def logout(
     request: Request,
-    payload: LogoutPayloadSchema,
+    payload: LogoutSchema,
     db: Session = Depends(dependency=get_db),
 ) -> JSONResponse:
     try:
@@ -181,9 +183,50 @@ async def logout(
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-@router.get(path="/users", summary="用户分页", response_model=Page)
+
+@router.put(path='/upload', summary="上传文件", dependencies=[Depends(dependency=get_current_user)])
+async def upload_file(
+    request: Request,
+    file: UploadFile = File(...)
+):
+    """上传文件"""
+    try:
+        if not file.filename or not file.content_type:
+            logger.warning(f"文件不支持")
+            return ErrorResponse(message="文件不支持")
+        file_extension = mimetypes.guess_extension(file.content_type)
+        if not file_extension in settings.ALLOWED_EXTENSIONS:
+            logger.warning(f"文件 {file.filename} 格式不支持上传")
+            return ErrorResponse(message="文件不允许上传")
+        if file.size and file.size > settings.MAX_FILE_SIZE:
+            logger.warning(f"文件 {file.filename} 大小不可以超过10MB")
+            return ErrorResponse(message="文件大小超过限制10MB")
+        
+        # 构建文件名称
+        name, ext = file.filename.rsplit(".", 1)
+        filename = f'{name}_{datetime.now().strftime("%Y%m%d%H%M%S")}{settings.UPLOAD_MACHINE}.{ext}'
+
+        # 构建文件路径
+        dir_path = settings.UPLOAD_FILE_PATH
+        dir_path.mkdir(parents=True, exist_ok=True)
+        filepath = dir_path / filename
+
+        # 分块写入文件
+        chunk_size = 8 * 1024 * 1024  # 8MB chunks
+        async with aiofiles.open(filepath, 'wb') as f:
+            while chunk := await file.read(chunk_size):
+                await f.write(chunk)
+
+        # 返回相对路径
+        logger.info(f"文件 {file.filename} 上传成功，路径为 {filepath}")
+        return SuccessResponse(data=f'{request.base_url}{filepath}')
+    
+    except Exception as e:
+        logger.error(f"系统异常: {e}")
+        raise ExceptResponse(message=f"系统异常: {e}")
+
+@router.get(path="/users", summary="用户分页", response_model=Page, dependencies=[Depends(dependency=get_current_user)])
 async def list_user(
-    auth: User = Depends(dependency=get_current_user),
     offset: int = Query(default=0, description="偏移量"),
     limit: int = Query(default=10, description="每页数量"),
     order_by: str | None = Query(default=None, description="排序字段", example={"id": "asc"}),
@@ -193,9 +236,7 @@ async def list_user(
     try:
         sql = select(User)
         if name:
-            sql = sql.where(and_(initial_clause=User.name.contains(name)))
-        if not auth.is_superuser:
-            sql = sql.where(User.parent_id == auth.id)
+            sql = sql.where(and_(User.name.contains(name)))
 
         # 获取总数
         total: int | None = db.exec(select(func.count()).select_from(sql)).first()
@@ -222,7 +263,7 @@ async def list_user(
         logger.info("查询用户成功")
         return SuccessResponse(
             data=Page(
-                items=[User2Schema.model_validate(obj).model_dump() for obj in objs],
+                items=[UserOutSchema.model_validate(obj).model_dump() for obj in objs],
                 total=total,
                 page_no=offset // limit + 1 if limit else 1,
                 page_size=limit,
@@ -235,7 +276,7 @@ async def list_user(
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-@router.post(path="/user", summary="创建用户", response_model=User2Schema, dependencies=[Depends(dependency=get_current_user)])
+@router.post(path="/user", summary="创建用户", response_model=UserOutSchema, dependencies=[Depends(dependency=get_current_user)])
 async def create_user(
     obj: UserSchema, db: Session = Depends(dependency=get_db)
 ) -> JSONResponse:
@@ -256,13 +297,13 @@ async def create_user(
 
         logger.info(f"用户 {obj.name} 创建成功")
 
-        return SuccessResponse(data=User2Schema.model_validate(obj_db).model_dump())
+        return SuccessResponse(data=UserOutSchema.model_validate(obj_db).model_dump())
 
     except Exception as e:
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-@router.get(path="/user/{id}", summary="用户详情", response_model=User2Schema, dependencies=[Depends(dependency=get_current_user)])
+@router.get(path="/user/{id}", summary="用户详情", response_model=UserOutSchema, dependencies=[Depends(dependency=get_current_user)])
 async def detail_user(
     id: int = Path(default=..., description="用户ID"),
     db: Session = Depends(dependency=get_db),
@@ -276,13 +317,13 @@ async def detail_user(
 
         logger.info(f"获取用户{id}详情成功")
         return SuccessResponse(
-            data=User2Schema.model_validate(existing_obj).model_dump()
+            data=UserOutSchema.model_validate(existing_obj).model_dump()
         )
     except Exception as e:
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-@router.put(path="/user/{id}", summary="更新用户", response_model=User2Schema, dependencies=[Depends(dependency=get_current_user)])
+@router.patch(path="/user/{id}", summary="更新用户", response_model=UserOutSchema, dependencies=[Depends(dependency=get_current_user)])
 async def update_user(
     obj: UserSchema,
     id: int = Path(default=..., description="用户ID"),
@@ -297,7 +338,8 @@ async def update_user(
         if existing_obj.is_superuser:
             logger.warning("超级管理员不允许修改")
             return ErrorResponse(message="超级管理员不允许修改")
-
+        if obj.password:
+            obj.password = set_password_hash(password=obj.password)
         update_data_dict = obj.model_dump(exclude_unset=True)
         existing_obj.sqlmodel_update(update_data_dict)
         existing_obj.updated_at = datetime.now()
@@ -308,14 +350,14 @@ async def update_user(
 
         logger.info(f"更新用户{id}成功")
         return SuccessResponse(
-            data=User2Schema.model_validate(existing_obj).model_dump()
+            data=UserOutSchema.model_validate(existing_obj).model_dump()
         )
 
     except Exception as e:
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-@router.delete(path="/user/{id}", summary="删除用户", response_model=User, dependencies=[Depends(dependency=get_current_user)])
+@router.delete(path="/user/{id}", summary="删除用户", response_model=UserOutSchema, dependencies=[Depends(dependency=get_current_user)])
 async def delete_user(
     id: int = Path(default=..., description="用户ID"),
     db: Session = Depends(dependency=get_db),
@@ -334,7 +376,7 @@ async def delete_user(
         db.commit()
         logger.info(f"删除用户{id}成功")
         return SuccessResponse(
-            data=User2Schema.model_validate(existing_obj).model_dump()
+            data=UserOutSchema.model_validate(existing_obj).model_dump()
         )
 
     except Exception as e:

@@ -3,12 +3,12 @@
 import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
 from fastapi.requests import Request
+from fastapi.responses import Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.types import ASGIApp
 
-from app.core.logger import logger
+from app.core.log import logger
 
 
 class CustomCORSMiddleware(CORSMiddleware):
@@ -37,11 +37,17 @@ class RequestLogMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         start_time: float = time.time()
 
+        body = await request.body()
+        try:
+            body_content = body.decode('utf-8')
+        except UnicodeDecodeError:
+            body_content = f"<binary data, length={len(body)}>"
+            
         logger.info(
             f"客户端IP: {request.client.host if request.client else '未知'} | "
             f"方法: {request.method} | 路径: {request.url.path} | "
             f"查询参数: {request.query_params} | "
-            f"请求体参数: {(await request.body()).decode(encoding='utf-8')}"
+            f"请求体参数: {body_content}"
         )
 
         response = await call_next(request)
