@@ -24,7 +24,7 @@ English | [Chinese](./README.md)
 
 ### Project Overview
 
-FastAPI-Vue3-App is a full-stack open-source project designed to help developers quickly build mobile, mini-program, and H5 applications based on modern technology stacks. The project integrates various popular tools and frameworks required for backend, frontend, and cross-platform development, providing a one-stop solution.
+FastAPI-Vue3-App is a full-stack open-source project designed to assist developers in quickly building mobile, mini-program, and H5 applications. The backend uses FastAPI for asynchronous programming to enhance the application's concurrent processing capabilities, SQLModel to simplify database operations, Alembic to manage database versions, and JWT for authentication and authorization. The frontend utilizes Vue3 to build user interfaces, combines with Vite for rapid construction, leverages UniApp for cross-platform development, and pairs with Uni-UI to enrich components. It provides a one-stop development solution, which is efficient and convenient.
 
 > Backend Technology Stack:
 
