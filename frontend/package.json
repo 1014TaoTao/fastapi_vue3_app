@@ -51,6 +51,7 @@
     "@dcloudio/uni-quickapp-webview": "3.0.0-4050720250324001",
     "@dcloudio/uni-ui": "^1.5.7",
     "unplugin-auto-import": "^19.1.2",
+    "uview-plus": "^3.3.74",
     "vue": "3.5.13",
     "vue-i18n": "9.14.3"
   },
@@ -62,8 +63,9 @@
     "@dcloudio/vite-plugin-uni": "3.0.0-4050720250324001",
     "@vue/runtime-core": "3.5.13",
     "pinia": "^2.3.0",
-    "sass": "^1.86.1",
-    "sass-loader": "^16.0.5",
+    "sass": "1.63.2",
+    "sass-loader": "10.4.1",
+    "unocss": "^0.58.9",
     "vite": "5.2.8"
   }
 }

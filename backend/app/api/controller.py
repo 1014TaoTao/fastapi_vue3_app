@@ -135,6 +135,9 @@ async def register(
 ) -> JSONResponse:
     """注册用户"""
     try:
+        if not payload.name or payload.username or payload.password:
+            logger.warning("注册用户失败，参数不完整")
+            return ErrorResponse(message="注册失败，必填项不可以为空")
         existing_obj: User | None = db.exec(
             select(User).where(User.username == payload.username)
         ).first()

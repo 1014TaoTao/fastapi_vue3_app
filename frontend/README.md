@@ -41,3 +41,11 @@ npm run dev:h5
 ```sh
 npm run build
 ```
+
+### 注意
+
+在sass1.8.0以上版本报错Deprecation Warning: Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0. 因为新版本Sass的@use语法较为激进，如果升级为@use将会是破坏式更新，所以推荐将sass固定在以下版本结局报警。
+"uview-plus": "^3.3.74", 版本不要升级
+"unocss": "^0.58.9", 版本不要升级
+"sass": "1.63.2",    //sass版本不要升级
+"sass-loader": "10.4.1",  //sass-loader版本不要升级

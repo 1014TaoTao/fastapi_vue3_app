@@ -1,60 +1,46 @@
 <template>
     <view class="forgot-container">
-        
-        <uni-forms ref="form" v-model="formData" :rules="rules">
-            <uni-forms-item name="username">
-                <uni-easyinput 
-                    v-model="formData.username" 
-                    prefixIcon="person" 
-                    placeholder="请输入账号" 
-                />
-            </uni-forms-item>
-            
-            <uni-forms-item name="old_password">
-                <uni-easyinput 
-                    v-model="formData.old_password" 
-                    type="password" 
-                    prefixIcon="locked" 
-                    placeholder="请输入旧密码" 
-                />
-            </uni-forms-item>
-            
-            <uni-forms-item name="new_password">
-                <uni-easyinput 
-                    v-model="formData.new_password" 
-                    type="password" 
-                    prefixIcon="locked" 
-                    placeholder="请输入新密码" 
-                />
-            </uni-forms-item>
-            
-            <uni-forms-item name="confirm_password">
-                <uni-easyinput 
-                    v-model="formData.confirm_password" 
-                    type="password" 
-                    prefixIcon="locked" 
-                    placeholder="请确认新密码" 
-                />
-            </uni-forms-item>
-            
-            <button 
-                type="primary" 
-                @click="handleSubmit"
-                :loading="loading"
-            >确认</button>
-        </uni-forms>
-        
-        <view class="action-link" @click="handleGo">返回登录</view>
+        <up-form ref="form" :model="formData" :rules="rules">
+            <!-- 用户名 -->
+            <up-form-item prop="username">
+                <up-input v-model="formData.username" placeholder="请输入账号" prefix-icon="account" clearable />
+            </up-form-item>
+
+            <!-- 账号 -->
+            <up-form-item prop="old_password">
+                <up-input v-model="formData.old_password" placeholder="请输入旧密码" prefix-icon="account" clearable />
+            </up-form-item>
+
+            <!-- 密码 -->
+            <up-form-item prop="new_password">
+                <up-input v-model="formData.new_password" type="password" placeholder="请输入新密码" prefix-icon="lock"
+                    clearable @keyup.enter="handleSubmit" />
+            </up-form-item>
+
+            <up-form-item prop="confirm_password">
+                <up-input v-model="formData.confirm_password" type="password" placeholder="请确认新密码" prefix-icon="lock"
+                    clearable @keyup.enter="handleSubmit" />
+            </up-form-item>
+
+
+            <!-- 登录按钮 -->
+            <up-button class="btn" type="primary" text="确认" :loading="isLoading" @click="handleSubmit" />
+
+            <up-text type="info" @click="handleGo" align="center" lineHeight="40" text="返回登录" />
+        </up-form>
+        <view>
+
+        </view>
     </view>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { onReady } from '@dcloudio/uni-app';
-import { forgot_password } from '../../api/apis';
+import { forgot_password } from '@/api/apis';
 
+const isLoading = ref(false);
 const form = ref(null);
-const loading = ref(false);
 
 const formData = ref({
     username: '',
@@ -64,102 +50,47 @@ const formData = ref({
 });
 
 // 表单验证规则
+// 表单验证规则
 const rules = {
-    username: {
-        rules: [{
-            required: true,
-            errorMessage: '账号不能为空'
-        }]
-    },
-    old_password: {
-        rules: [{
-            required: true,
-            errorMessage: '旧密码不能为空'
-        }]
-    },
-    new_password: {
-        rules: [{
-            required: true,
-            errorMessage: '新密码不能为空'
-        }]
-    },
-    confirm_password: {
-        rules: [{
-            required: true,
-            errorMessage: '确认密码不能为空'
-        }, {
-            validateFunction: (rule, value, data, callback) => {
-                if (value !== formData.value.new_password) {
-                    callback('新密码和确认密码不一致');
-                }
-                return true;
-            }
-        }]
-    }
-};
+    username: { required: true, message: '请输入账号' },
+    old_password: { required: true, message: '请输入旧密码' },
+    new_password: { required: true, message: '请输入新密码' },
+    confirm_password: { required: true, message: '请确认新密码' }
+}
 
 onReady(() => {
     console.log('这是忘记密码页面')
 });
 
-async function handleSubmit() {
-    // 先进行完整的前端验证
-    form.value.validate().then(async () => {
-        // 先进行完整的前端验证
-        loading.value = true;
-        // 发送登录请求
-        const res = await forgot_password(formData.value);
-        console.log('密码重置成功', res.data);
+const handleSubmit = async () => {
+    try {
+        await form.value.validate();
+        isLoading.value = true
+
+        const result = await forgot_password(formData.value);
+        console.log('密码重置成功', result.data);
+
         // 跳转到登录页面
         uni.navigateTo({ url: '/pages/login/login' });
-        
-        loading.value = false;
-    }).catch(err => {
-        console.log('表单验证失败', err);
-    });
+    } catch (error) {
+        uni.showToast({ title: error.message || '密码重置失败', icon: 'none' })
+    } finally {
+        isLoading.value = false
+    }
 };
 
+
 function handleGo() {
-    uni.navigateTo({ url: '/pages/login/login' }); 
+    uni.navigateTo({ url: '/pages/login/login' });
 };
 </script>
 
 <style lang="scss" scoped>
 .forgot-container {
-    padding: 40rpx 60rpx;
-    
-    .form-title {
-        font-size: 40rpx;
-        font-weight: bold;
-        text-align: center;
-        margin: 40rpx 0 60rpx;
-        color: #333;
-    }
-    
-    :deep(.uni-forms-item__label) {
-        display: none;
-    }
-    
-    :deep(.uni-easyinput__content) {
-        background-color: #f8f8f8;
-        border-radius: 12rpx;
-    }
-    
-    .button {
+    padding: 60rpx 60rpx;
+
+    .btn {
         margin-top: 40rpx;
-        height: 90rpx;
-        line-height: 90rpx;
-        font-size: 32rpx;
-        border-radius: 12rpx;
-    }
-    
-    .action-link {
-        display: block;
-        text-align: center;
-        margin-top: 30rpx;
-        color: #666;
-        font-size: 28rpx;
     }
 }
 </style>
-

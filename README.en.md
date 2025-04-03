@@ -24,7 +24,7 @@ English | [Chinese](./README.md)
 
 ### Project Overview
 
-FastAPI-Vue3-App is a full-stack open-source project designed to assist developers in quickly building mobile, mini-program, and H5 applications. The backend uses FastAPI for asynchronous programming to enhance the application's concurrent processing capabilities, SQLModel to simplify database operations, Alembic to manage database versions, and JWT for authentication and authorization. The frontend utilizes Vue3 to build user interfaces, combines with Vite for rapid construction, leverages UniApp for cross-platform development, and pairs with Uni-UI to enrich components. It provides a one-stop development solution, which is efficient and convenient.
+FastAPI-Vue3-App is a full-stack open-source project designed to assist developers in quickly building mobile, mini-program, and H5 applications. The backend uses FastAPI for asynchronous programming to enhance the application's concurrent processing capabilities, SQLModel to simplify database operations, Alembic to manage database versions, and JWT for authentication and authorization. The frontend utilizes Vue3 to build user interfaces, combines with Vite for rapid construction, leverages UniApp for cross-platform development, and pairs with uView-plus to enrich components. It provides a one-stop development solution, which is efficient and convenient.
 
 > Backend Technology Stack:
 
@@ -38,7 +38,7 @@ FastAPI-Vue3-App is a full-stack open-source project designed to assist develope
 - **Vue3**: A progressive JavaScript framework for building user interfaces.
 - **Vite**: A fast frontend build tool that supports hot reloading.
 - **UniApp**: A cross-platform application development framework that supports multi-terminal development.
-- **Uni-UI**: A Vue3-based UI component library that provides a rich set of components.
+- **uView-plus**: A Vue3-based UI component library that provides a rich set of components.
 
 ### Main Features
 
@@ -107,7 +107,7 @@ Thanks to the contributions and support of the following projects, which have en
 - [Vue3 项目](https://github.com/vuejs/vue)
 - [Vite 项目](https://github.com/vitejs/vite)
 - [UniApp 项目](https://github.com/dcloudio/uni-app)
-- [Uni-UI 项目](https://github.com/dcloudio/uni-ui)
+- [uView-plus 项目](https://uiadmin.net/uview-plus)
 
 ### Participation and Support
 

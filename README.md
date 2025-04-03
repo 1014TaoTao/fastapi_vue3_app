@@ -24,7 +24,7 @@
 
 ### 项目概述
 
-FastAPI-Vue3-App 是全栈开源项目，旨在助开发者快速搭建移动、小程序和 H5 应用。后端采用 FastAPI 异步编程提升并发，用 SQLModel 简化数据库操作，以 Alembic 管理版本，借 JWT 实现身份验证与授权；前端运用 Vue3 构建界面，结合 Vite 实现快速构建，借助 UniApp 跨平台开发，搭配 Uni-UI 丰富组件。提供一站式开发方案，高效便捷。
+FastAPI-Vue3-App 是全栈开源项目，旨在助开发者快速搭建移动、小程序和 H5 应用。后端采用 FastAPI 异步编程提升并发，用 SQLModel 简化数据库操作，以 Alembic 管理版本，借 JWT 实现身份验证与授权；前端运用 Vue3 构建界面，结合 Vite 实现快速构建，借助 UniApp 跨平台开发，搭配 uView-plus 丰富组件。提供一站式开发方案，高效便捷。
 
 > 后端技术栈：
 
@@ -38,7 +38,7 @@ FastAPI-Vue3-App 是全栈开源项目，旨在助开发者快速搭建移动、
 - **Vue3**: 渐进式JavaScript框架，用于构建用户界面。
 - **Vite**: 快速的前端构建工具，支持热重载。
 - **UniApp**: 跨平台应用开发框架，支持多端开发。
-- **Uni-UI**: 基于Vue3的UI组件库，提供丰富的组件。
+- **uView-plus**: 基于Vue3的UI组件库，提供丰富的组件。
 
 ### 主要特性
 
@@ -107,7 +107,7 @@ fastapi_vue3_app/
 - [Vue3 项目](https://github.com/vuejs/vue)
 - [Vite 项目](https://github.com/vitejs/vite)
 - [UniApp 项目](https://github.com/dcloudio/uni-app)
-- [Uni-UI 项目](https://github.com/dcloudio/uni-ui)
+- [uView-plus 项目](https://uiadmin.net/uview-plus)
 
 ### 参与和支持
 

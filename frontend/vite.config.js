@@ -1,15 +1,14 @@
+import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from "vite";
 import uni from "@dcloudio/vite-plugin-uni";
+import UnoCSS from 'unocss/vite'
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  css: {
-    preprocessorOptions: {
-      scss: {
-        api: 'modern-compiler' // 或 "modern"
-      }
-    }
-  },
-  plugins: [uni()],
+  plugins: [
+    uni(),
+    UnoCSS(),
+  ],
   server: {
     host: "0.0.0.0",
     port: 5180,
@@ -22,4 +21,9 @@ export default defineConfig({
       },
     },
   },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  }
 });
