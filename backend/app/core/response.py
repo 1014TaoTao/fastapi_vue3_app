@@ -14,7 +14,7 @@ class SuccessResponse(JSONResponse):
     def __init__(
             self,
             data: Any | None = None,
-            message: str = "success",
+            message: str = "成功",
             status_code: int = status.HTTP_200_OK,
     ) -> None:
         """
@@ -34,7 +34,7 @@ class ErrorResponse(JSONResponse):
     def __init__(
             self,
             data: Any | None = None,
-            message: str = "error",
+            message: str = "失败",
             status_code: int = status.HTTP_400_BAD_REQUEST,
     ) -> None:
         """
@@ -54,7 +54,7 @@ class ExceptResponse(HTTPException):
     def __init__(
             self,
             data: Optional[Any] = None,
-            message: str = "network error...",
+            message: str = "发生异常",
             status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
     ) -> None:
         """

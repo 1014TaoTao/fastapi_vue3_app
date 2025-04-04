@@ -63,7 +63,7 @@ const handleSubmit = async () => {
         // 跳转到登录页面
         uni.navigateTo({ url: '/pages/login/login' });
     } catch (error) {
-        uni.showToast({ title: error.message || '注册失败', icon: 'none' })
+        console.error('注册用户失败', error);
     } finally {
         isLoading.value = false
     }

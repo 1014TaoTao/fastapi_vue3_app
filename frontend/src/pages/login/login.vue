@@ -3,7 +3,7 @@
         <!-- 登录表单 -->
         <up-image class="logo" :src="LOGO_PATH" shape="circle" width="100" height="100" mode="aspectFit" />
         <up-text class="logo-text" :bold="true" align="center" size="24" lineHeight="40" text="用户管理系统" />
-        <up-form ref="loginForm" :model="formData" :rules="rules" class="auth-form">
+        <up-form ref="loginForm" class="auth-form" :model="formData" :rules="rules">
             <!-- 用户名 -->
             <up-form-item prop="username">
                 <up-input v-model="formData.username" placeholder="请输入账号" prefix-icon="account" clearable />
@@ -16,7 +16,7 @@
             </up-form-item>
 
             <!-- 登录按钮 -->
-            <up-button type="primary" text="登录" :loading="isLoading" @click="handleSubmit" class="login-btn" />
+            <up-button class="login-btn" type="primary" text="登录" :loading="isLoading" @click="handleSubmit" />
         </up-form>
 
         <!-- 底部链接 - 左右分开 -->
@@ -52,12 +52,13 @@ const handleSubmit = async () => {
         isLoading.value = true
 
         const result = await login(formData.value)
+        console.log('登录成功', result.data)
         useUserStore().setUser(result.data.user_id, result.data.access_token)
 
         uni.switchTab({ url: '/pages/home/home' })
-        uni.showToast({ title: '登录成功' })
+
     } catch (error) {
-        uni.showToast({ title: error.message || '登录失败', icon: 'none' })
+        console.error('登录失败', error)
     } finally {
         isLoading.value = false
     }
@@ -66,6 +67,7 @@ const handleSubmit = async () => {
 const navigateTo = (page) => {
     uni.navigateTo({ url: `/pages/login/${page}` })
 }
+
 </script>
 
 <style scoped lang="scss">
@@ -74,24 +76,21 @@ const navigateTo = (page) => {
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    .auth-form {
+        margin-top: 40rpx;
+        width: 100%;
+
+        .login-btn {
+            margin-top: 40rpx;
+        }
+
+    }
+
+    .footer-links {
+        margin-top: 40rpx;
+        display: flex;
+        width: 100%;
+    }
 }
-
-
-.auth-form {
-    margin-top: 40rpx;
-    width: 100%;
-}
-
-.login-btn {
-    margin-top: 40rpx;
-}
-
-/* 底部链接布局 */
-.footer-links {
-    margin-top: 40rpx;
-    display: flex;
-    width: 100%;
-}
-
-
 </style>

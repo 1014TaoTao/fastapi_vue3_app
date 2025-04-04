@@ -49,7 +49,6 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-4050720250324001",
     "@dcloudio/uni-mp-xhs": "3.0.0-4050720250324001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-4050720250324001",
-    "@dcloudio/uni-ui": "^1.5.7",
     "unplugin-auto-import": "^19.1.2",
     "uview-plus": "^3.3.74",
     "vue": "3.5.13",

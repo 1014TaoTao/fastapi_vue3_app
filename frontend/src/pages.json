@@ -5,9 +5,7 @@
 			// uView-plus 规则如下配置
 			"^u--(.*)": "uview-plus/components/u-$1/u-$1.vue",
 			"^up-(.*)": "uview-plus/components/u-$1/u-$1.vue",
-	    	"^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue",
-			// uni-ui 规则如下配置
-			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+	    	"^u-([^-].*)": "uview-plus/components/u-$1/u-$1.vue"
 		}
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
@@ -42,16 +40,16 @@
 			"path" : "pages/home/home",
 			"style" : 
 			{
-				"navigationBarTitleText" : "首页"
+				"navigationBarTitleText" : "首页",
+				"enablePullDownRefresh": true
 			}
 		}
 	],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",// 导航栏字体颜色
+		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "用户信息管理系统",// 导航蓝字体内容
-		"navigationBarBackgroundColor": "#F8F8F8",//导航蓝背景颜色
-		"backgroundColor": "#F8F8F8",// 下拉刷新区背景颜色
-		"enablePullDownRefresh": true // 下拉刷新
+		"navigationBarBackgroundColor": "#3b83ff",//导航蓝背景颜色
+		"backgroundColor": "#F8F8F8"// 下拉刷新区背景颜色
 	},
 	"tabBar": {
 		"color": "#999",
@@ -69,8 +67,7 @@
 				"iconPath": "/static/mine.png",
 				"selectedIconPath": "/static/select-mine.png"
 			}
-		],
-		"height": "90rpx"
+		]
 	},
 	"uniIdRouter": {}
 }

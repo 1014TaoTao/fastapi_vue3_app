@@ -50,7 +50,6 @@ const formData = ref({
 });
 
 // 表单验证规则
-// 表单验证规则
 const rules = {
     username: { required: true, message: '请输入账号' },
     old_password: { required: true, message: '请输入旧密码' },
@@ -73,7 +72,8 @@ const handleSubmit = async () => {
         // 跳转到登录页面
         uni.navigateTo({ url: '/pages/login/login' });
     } catch (error) {
-        uni.showToast({ title: error.message || '密码重置失败', icon: 'none' })
+        console.error('密码重置失败', error);
+        
     } finally {
         isLoading.value = false
     }

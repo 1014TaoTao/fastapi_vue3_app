@@ -1,316 +1,122 @@
 <template>
-	<view>
-		<app-layout>
-			<template #main>
-				<view class="user-list-container">
-					<!-- 搜索区域 -->
-					<view class="search-area">
-						<uni-search-bar class="search-input" placeholder="请输入用户名" @confirm="handleSearch"
-							v-model="searchQuery" @clear="handleSearch">
-						</uni-search-bar>
-					</view>
-
-					<!-- 用户列表区域 -->
-					<uni-section title="用户列表" type="line" padding>
-						<uni-list :border="true">
-							<uni-list-item v-for="item in tableData"
-								:avatar="item.avatar || '/static/default-avatar.png'" :key="item.id" :title="item.name"
-								:note="item.created_at" :show-badge="true" :badge-text="item.disabled ? '禁用' : '启用'"
-								:badge-style="item.disabled ? disabledBadgeStyle : enabledBadgeStyle" clickable
-								@click="showDetailPopup(item)">
-								<!-- 左侧头像 -->
-								<template v-slot:header>
-									<view class="avatar-wrapper">
-										<image class="avatar" :src="item.avatar || '/static/default-avatar.png'"
-											mode="widthFix"></image>
-									</view>
-								</template>
-							</uni-list-item>
-						</uni-list>
-					</uni-section>
-
-					<!-- 加载更多 -->
-					<uni-load-more :status="loadStatus" :content-text="{
-						contentdown: '上拉加载更多',
-						contentrefresh: '正在加载...',
-						contentnomore: '没有更多数据了'
-					}" @clickLoadMore="loadMore" />
-				</view>
-
-				<!-- 详情弹窗 -->
-				<uni-popup ref="detailPopup" type="center" :is-mask-click="true">
-					<view class="popup-content">
-						<view class="popup-header">
-							<text class="popup-title">{{ popupTitle }}</text>
-							<uni-icons type="closeempty" size="24" color="#999" @click="closeDetailPopup"></uni-icons>
-						</view>
-						<scroll-view class="popup-body" scroll-y>
-							<view class="detail-item" v-for="(value, key) in currentDetail" :key="key">
-								<text class="detail-label">{{ formatLabel(key) }}:</text>
-								<text class="detail-value">{{ formatValue(key, value) }}</text>
-							</view>
-						</scroll-view>
-						<view class="popup-footer">
-							<button class="popup-button" @click="closeDetailPopup">关闭</button>
-						</view>
-					</view>
-				</uni-popup>
-			</template>
-		</app-layout>
-	</view>
+	<app-layout>
+		<template #main>
+			<view class="home-container">
+				<!-- 搜索框 -->
+				<up-search 
+					:placeholder="'搜索用户'" 
+					v-model="pageQuery.name" 
+					:show-action="false"
+					@search="handleUserList" 
+					@clear="handleClearSearch" 
+				/>
+				
+				<!-- 列表容器 -->
+				<up-list :border="false" height="auto">
+					<up-list-item v-for="item in tableData" :key="item.id">
+						<up-cell :border="false" :label="item.created_at">
+							<template #icon>
+								<up-avatar shape="square" size="35"
+									:src="item.avatar || '/static/default-avatar.png'"
+									custom-style="margin-right: 10rpx"></up-avatar>
+							</template>
+							<template #title>
+								<view class="cell-content">
+									<text class="name">{{ item.name }}</text>
+								</view>
+							</template>
+							<template #right-icon>
+								<view class="tag-group">
+									<up-tag :type="item.disabled ? 'error' : 'primary'" size="mini"
+										:text="item.disabled ? '禁用' : '启用'" custom-style="margin-left: 8rpx" />
+									<up-tag v-if="item.is_superuser" type="info" size="mini" text="管理员" plain
+										custom-style="margin-left: 8rpx" />
+								</view>
+							</template>
+						</up-cell>
+					</up-list-item>
+				</up-list>
+				<!-- 加载更多 -->
+				<up-loadmore 
+					:status="loadStatus" 
+					:load-text="{ loadmore: '上拉或点击加载更多' }" 
+					@loadmore="loadMore" 
+				/>
+				<!-- 空数据提示 -->
+				<up-empty v-if="pagination.total === 0" mode="data" text="暂无用户数据"></up-empty>
+			</view>
+		</template>
+	</app-layout>
 </template>
 
 <script setup>
 import { ref, reactive } from "vue";
-import { onLoad } from "@dcloudio/uni-app";
-import {
-	list_user,
-	detail_user,
-} from "@/api/apis";
+import { onLoad } from '@dcloudio/uni-app';
+import { list_user } from "@/api/apis";
 
-// 状态定义
-const loadStatus = ref('more');
-const searchQuery = ref('');
+// 响应式数据
+const loadStatus = ref('loadmore');
 const tableData = ref([]);
-const detailPopup = ref(null);
-const currentDetail = ref({});
-const popupTitle = ref('');
-
-// 徽章样式
-const enabledBadgeStyle = reactive({
-	backgroundColor: '#0f0',
-	color: '#fff'
+const pageQuery = ref({
+	name: '',
+	offset: 0,
+	limit: 8
 });
-const disabledBadgeStyle = reactive({
-	backgroundColor: '#f00',
-	color: '#fff'
-});
-
-// 分页参数
+// 分页配置
 const pagination = reactive({
-	page: 1,
-	pageSize: 10,
-	total: 0
+	total: 0, // 总数据条数
+	hasNext: null, // 是否有下一页
 });
 
-const formData = reactive({
-	id: null,
-	name: "",
-	username: "",
-	password: "",
-	disabled: null,
-	is_superuser: null,
-	avatar: "",
-	description: "",
-	created_at: "",
-	updated_at: "",
-});
-
-// 初始化加载数据
+// 初始化加载
 onLoad(() => {
-	fetchUserList();
+	handleUserList();
 });
 
 // 获取用户列表
-const fetchUserList = async () => {
+const handleUserList = async () => {
+	loadStatus.value = 'loading';
 	try {
-		const params = {
-			offset: (pagination.page - 1) * pagination.pageSize,
-			limit: pagination.pageSize,
-			name: searchQuery.value
-		};
-
-		const res = await list_user(params);
-
-		if (pagination.page === 1) {
-			tableData.value = res.data.items.map(item => ({
-				...formData,
-				...item
-			}));
+		const result = await list_user(pageQuery.value);
+		// 确保 API 返回的数据结构正确
+		if (result && result.data.items) {
+			if (pageQuery.value.offset === 0) {
+				tableData.value = result.data.items;
+			} else {
+				tableData.value = [...tableData.value, ...result.data.items];
+			}
+			// 更新分页状态
+			pagination.hasNext = result.data.has_next;
+			pagination.total = result.data.total;
+			loadStatus.value = pagination.hasNext ? 'loadmore' : 'nomore';
 		} else {
-			tableData.value = [...tableData.value, ...res.data.items.map(item => ({
-				...formData,
-				...item
-			}))];
+			throw new Error('API 数据结构异常');
 		}
-
-		pagination.total = res.data.total;
-		loadStatus.value = res.data.has_more ? 'more' : 'noMore';
 	} catch (error) {
-		console.error('获取用户列表失败:', error);
-		uni.showToast({
-			title: '获取用户列表失败',
-			icon: 'none'
-		});
+		loadStatus.value = 'error';
+		console.error('加载用户列表失败:', error);
 	}
-};
-
-// 搜索用户
-const handleSearch = () => {
-	pagination.page = 1;
-	fetchUserList();
 };
 
 // 加载更多
 const loadMore = () => {
-	if (loadStatus.value === 'more') {
-		pagination.page++;
-		fetchUserList();
+	if (pagination.hasNext && loadStatus.value === 'loadmore') {
+		pageQuery.value.offset += pageQuery.value.limit;
+		handleUserList();
 	}
 };
 
-// 显示详情弹窗
-const showDetailPopup = async (user) => {
-	try {
-		const res = await detail_user(user.id);
-		currentDetail.value = res.data;
-		popupTitle.value = `${res.data.id} - ${res.data.name}`;
-		detailPopup.value.open();
-	} catch (error) {
-		console.error('获取用户详情失败:', error);
-		uni.showToast({
-			title: '获取用户详情失败',
-			icon: 'none'
-		});
-	}
-};
-
-// 关闭详情弹窗
-const closeDetailPopup = () => {
-	detailPopup.value.close();
-};
-
-// 格式化字段标签
-const formatLabel = (key) => {
-	const labels = {
-		id: 'ID',
-		name: '用户名',
-		username: '登录账号',
-		disabled: '状态',
-		is_superuser: '管理员类型',
-		avatar: '头像',
-		description: '描述',
-		created_at: '创建时间',
-		updated_at: '更新时间',
-		password: '密码'
-	};
-	return labels[key] || key;
-};
-
-// 格式化字段值
-const formatValue = (key, value) => {
-	if (!value && value !== false) return '无';
-
-	switch (key) {
-		case 'disabled':
-			return value ? '禁用' : '启用';
-		case 'is_superuser':
-			return value ? '超级管理员' : '普通用户';
-		case 'created_at':
-		case 'updated_at':
-			return formatDate(value);
-		default:
-			return value;
-	}
-};
-
-// 格式化日期
-const formatDate = (dateString) => {
-	if (!dateString) return '无';
-	const date = new Date(dateString);
-	return date.toLocaleString();
+// 清除搜索框时重置查询条件并重新加载数据
+const handleClearSearch = () => {
+	pageQuery.value.name = '';
+	pageQuery.value.offset = 0;
+	handleUserList();
 };
 </script>
 
 <style lang="scss" scoped>
-.user-list-container {
-	padding: 20rpx;
-	background-color: #f5f5f5;
-}
-
-.search-area {
-	display: flex;
-	align-items: center;
-	margin-bottom: 20rpx;
-	background: #fff;
-	border-radius: 16rpx;
-	padding: 20rpx;
-	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-
-	.search-input {
-		flex: 1;
-		margin-right: 20rpx;
-	}
-}
-
-.avatar-wrapper {
-	width: 80rpx;
-	height: 80rpx;
-	margin-right: 20rpx;
-
-	.avatar {
-		width: 100%;
-		height: 100%;
-		border-radius: 50%;
-		background-color: #f0f0f0;
-	}
-}
-
-/* 详情弹窗样式 */
-.popup-content {
-	width: 650rpx;
-	background-color: #fff;
-	border-radius: 16rpx;
-	overflow: hidden;
-}
-
-.popup-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+.home-container {
 	padding: 30rpx;
-	border-bottom: 1rpx solid #eee;
-}
-
-.popup-title {
-	font-size: 32rpx;
-	font-weight: bold;
-	color: #333;
-}
-
-.popup-body {
-	max-height: 800rpx;
-	padding: 30rpx;
-}
-
-.detail-item {
-	display: flex;
-	margin-bottom: 20rpx;
-	line-height: 1.6;
-}
-
-.detail-label {
-	flex: 0 0 180rpx;
-	color: #666;
-	font-weight: bold;
-}
-
-.detail-value {
-	flex: 1;
-	color: #333;
-	word-break: break-all;
-}
-
-.popup-footer {
-	padding: 20rpx;
-	display: flex;
-	justify-content: center;
-	border-top: 1rpx solid #eee;
-}
-
-.popup-button {
-	width: 200rpx;
-	background-color: #007aff;
-	color: #fff;
+	background-color: #f8f8f8;
 }
 </style>
