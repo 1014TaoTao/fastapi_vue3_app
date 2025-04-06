@@ -1,66 +1,68 @@
 import { defineStore } from "pinia";
-import { ref, computed } from 'vue';
+import { ref, computed, reactive, toRefs } from 'vue';
 
 export const useUserStore = defineStore('user', () => {
     // ============= State =============
-    const token = ref('')
-    const user_id = ref('')
-    
-    // 初始化状态
-    const initState = () => {
-        try {
-            token.value = uni.getStorageSync('token') || ''
-            user_id.value =  uni.getStorageSync('user_id') || ''
-        } catch (error) {
-            clearUser()
-        }
-    }
-    
-    // 初始化
-    initState()
+    const state = reactive({
+        token: uni.getStorageSync('token') || '',
+        userInfo: uni.getStorageSync('userInfo') || null
+    })
 
     // ============= Getters =============
-    const isLoggedIn = computed(() => !!token.value)
-
-    // ============= Actions =============
-    function setUser(userData, userToken) {
-        if (!userData || !userToken) return false
-        try {
-            user_id.value = userData
-            token.value = userToken
-            uni.setStorageSync('user_id', userData)
-            uni.setStorageSync('token', userToken)
-            return true
-        } catch (error) {
-            console.error('存储用户信息失败:', error)
-            return false
-        }
+    const getters = {
+        getToken: computed(() => !!state.token),
+        getUserInfo: computed(() => state.userInfo)
     }
 
-    function clearUser() {
-        user_id.value = null
-        token.value = ''
-        try {
-            uni.removeStorageSync('user_id')
-            uni.removeStorageSync('token')
-        } catch (error) {
-            console.error('清除用户信息失败:', error)
+    // ============= Actions =============
+    const actions = {
+        // 设置用户信息
+        setUser(userData) {
+            if (!userData) return false
+            try {
+                state.userInfo = userData
+                uni.setStorageSync('userInfo', userData)
+                return true
+            } catch (error) {
+                console.error('存储用户信息失败:', error)
+                return false
+            }
+        },
+
+        // 设置token
+        setToken(token) {
+            if (!token) return false
+            try {
+                state.token = token
+                uni.setStorageSync('token', token)
+                return true
+            } catch (error) {
+                console.error('存储token失败:', error)
+                return false
+            }
+        },
+
+        // 设置store
+        setStore(userData, userToken) {
+            return this.setUser(userData) && this.setToken(userToken)
+        },
+
+        // 清理状态
+        clear() {
+            state.userInfo = null
+            state.token = ''
+            try {
+                uni.removeStorageSync('userInfo')
+                uni.removeStorageSync('token')
+            } catch (error) {
+                console.error('清除用户信息失败:', error)
+            }
         }
     }
 
     return {
-        // State
-        token,
-        user_id,
-        
-        // Getters
-        isLoggedIn,
-        
-        // Actions
-        setUser,
-        clearUser,
-        initState
+        ...toRefs(state),
+        ...getters,
+        ...actions
     }
-}, {
-    persist: false // 禁用 Pinia 持久化，使用自定义存储
 })

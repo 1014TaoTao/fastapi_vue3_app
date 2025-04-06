@@ -16,7 +16,7 @@
             </up-form-item>
 
             <!-- 登录按钮 -->
-            <up-button class="login-btn" type="primary" text="登录" :loading="isLoading" @click="handleSubmit" />
+            <up-button class="login-btn" type="primary" text="登录" :loading="loading" @click="handleSubmit" />
         </up-form>
 
         <!-- 底部链接 - 左右分开 -->
@@ -33,7 +33,7 @@ import { useUserStore } from '../../stores/index'
 import { login } from '@/api/apis'
 
 const LOGO_PATH = '/static/logo.png'
-const isLoading = ref(false)
+const loading = ref(false)
 const loginForm = ref(null)
 
 const formData = ref({
@@ -42,26 +42,22 @@ const formData = ref({
 })
 
 const rules = {
-    username: { required: true, message: '请输入账号' },
-    password: { required: true, message: '请输入密码' }
+    username: { required: true, message: '请输入账号',trigger: ['change','blur'] },
+    password: { required: true, message: '请输入密码',trigger: ['change','blur'] }
 }
 
 const handleSubmit = async () => {
-    try {
-        await loginForm.value.validate()
-        isLoading.value = true
+    await loginForm.value.validate()
+    loading.value = true
 
-        const result = await login(formData.value)
-        console.log('登录成功', result.data)
-        useUserStore().setUser(result.data.user_id, result.data.access_token)
+    const result = await login(formData.value)
+    console.log('登录成功', result.data)
+    useUserStore().setStore(result.data.user_info, result.data.access_token)
 
-        uni.switchTab({ url: '/pages/home/home' })
+    uni.switchTab({ url: '/pages/home/home' })
 
-    } catch (error) {
-        console.error('登录失败', error)
-    } finally {
-        isLoading.value = false
-    }
+    loading.value = false
+
 }
 
 const navigateTo = (page) => {

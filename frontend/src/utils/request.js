@@ -9,6 +9,48 @@ export function request(options) {
     });
 
     return new Promise((resolve, reject) => {
+        // 处理文件上传
+        if (options.filePath) {
+            uni.uploadFile({
+                url: import.meta.env.VITE_API_BASE_URL + options.url,
+                method: options.method || "POST",
+                filePath: options.filePath,
+                name: "file",
+                header: {
+                    Authorization: userStore.token ? `Bearer ${userStore.token}` : "",
+                    // 移除 Content-Type，让 uni.uploadFile 自动处理 multipart/form-data
+                },
+                success: (res) => {
+                    const result = JSON.parse(res.data); // 解析返回的 JSON 数据
+                    if (result.code === 200) {
+                        uni.showToast({
+                            title: result.message || '上传成功',
+                            icon: "success",
+                            mask: true,
+                        });
+                        resolve(result);
+                    } else {
+                        uni.showToast({
+                            title: result.message || "上传失败",
+                            icon: "none",
+                            mask: true,
+                        });
+                        reject(result);
+                    }
+                },
+                fail: (error) => {
+                    console.error('上传失败:', error);
+                    uni.showToast({
+                        title: "上传失败",
+                        icon: "none",
+                    });
+                    reject(error);
+                },
+            });
+            return;
+        }
+
+        // 普通请求处理
         uni.request({
             url: import.meta.env.VITE_API_BASE_URL + options.url,
             method: options.method || "GET",
@@ -25,7 +67,7 @@ export function request(options) {
                         icon: "success",
                         mask: true,
                     });
-                    
+
                     resolve(res.data);
                 } else if (res.data.code === 401) {
                     uni.showToast({
@@ -33,7 +75,7 @@ export function request(options) {
                         icon: "none",
                         mask: true,
                     });
-                    userStore.clearUser();
+                    userStore.clear();
                     uni.reLaunch({ url: "/pages/login/login" });
                     reject(res.data);
                 } else {
@@ -52,7 +94,7 @@ export function request(options) {
                     mask: true,
                 });
                 reject(error);
-            }
+            },
         });
     });
 }

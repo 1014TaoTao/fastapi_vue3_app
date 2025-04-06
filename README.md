@@ -62,14 +62,20 @@ fastapi_vue3_app/
 <table>
     <tr>
         <td><img src="./frontend/public/登录.jpeg"/>登陆</td>
-        <td><img src="./frontend/public/注册.jpeg"/>注册</td>
-   </tr>
-   <tr>
-        <td><img src="./frontend/public/忘记密码.jpeg"/>忘记密码</td>
+        <td><img src="./frontend/public/注册.png"/>注册</td>
+        <td><img src="./frontend/public/忘记密码.png"/>忘记密码</td>
         <td><img src="./frontend/public/首页.jpeg"/>首页</td>
    </tr>
+   <tr>
+        <td><img src="./frontend/public/工作台.png"/>工作台</td>
+        <td><img src="./frontend/public/新增用户.png"/>新增用户</td>
+        <td><img src="./frontend/public/更新用户.png"/>更新用户</td>
+        <td><img src="./frontend/public/用户详情.png"/>用户详情</td>
+   </tr>
     <tr>
-        <td><img src="./frontend/public/个人中心.jpeg"/>个人中心</td>
+        <td><img src="./frontend/public/个人中心.png"/>个人中心</td>
+        <td><img src="./frontend/public/删除用户.png"/>个人中心</td>
+        <td><img src="./frontend/public/联系我们.png"/>联系我们</td>
    </tr>
 </table>
 

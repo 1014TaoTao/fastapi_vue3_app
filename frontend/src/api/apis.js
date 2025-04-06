@@ -6,12 +6,12 @@ const contentTypes = {
     multipart: "multipart/form-data"
 };
 
-export function upload(file) {
+export function upload_file(file) {
     return request({
         url: "/api/upload",
-        method: "put",
-        data: file,
-        header: { "Content-Type": contentTypes.multipart }
+        method: "post",
+        filePath: file
+        // 移除 header 设置，让 uni.uploadFile 自动处理
     });
 }
 

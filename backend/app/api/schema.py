@@ -58,13 +58,6 @@ class JWTPayloadSchema(SQLModel):
     exp: Union[datetime, int] = Field(default=..., description="过期时间")
 
 
-class JWTOutSchema(SQLModel):
-    """JWT响应模型"""
-
-    access_token: str = Field(default=..., description="访问token")
-    token_type: str = Field(default="Bearer", description="token类型")
-    expires_in: float = Field(default=..., gt=0, description="过期时间(秒)")
-    user_id: int | None = Field(description="用户ID")
 
 
 class ForgotPasswordSchema(SQLModel):
@@ -105,3 +98,12 @@ class UserOutSchema(BaseSchema, UserSchema):
 
     ...
     is_superuser: bool | None = Field(default=False, description="是否超级管理员")
+
+
+class JWTOutSchema(SQLModel):
+    """JWT响应模型"""
+
+    access_token: str = Field(default=..., description="访问token")
+    token_type: str = Field(default="Bearer", description="token类型")
+    expires_in: float = Field(default=..., gt=0, description="过期时间(秒)")
+    user_info: UserOutSchema

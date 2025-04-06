@@ -2,121 +2,292 @@
 	<app-layout>
 		<template #main>
 			<view class="home-container">
-				<!-- 搜索框 -->
-				<up-search 
-					:placeholder="'搜索用户'" 
-					v-model="pageQuery.name" 
-					:show-action="false"
-					@search="handleUserList" 
-					@clear="handleClearSearch" 
-				/>
-				
-				<!-- 列表容器 -->
-				<up-list :border="false" height="auto">
-					<up-list-item v-for="item in tableData" :key="item.id">
-						<up-cell :border="false" :label="item.created_at">
-							<template #icon>
-								<up-avatar shape="square" size="35"
-									:src="item.avatar || '/static/default-avatar.png'"
-									custom-style="margin-right: 10rpx"></up-avatar>
+				<up-search :placeholder="'搜索书名/作者/分类'" @search="handleSearch" clear="handleClearSearch" />
+
+				<view class="scroll-content">
+					<!-- 紧凑轮播图 -->
+					<view class="swiper-section">
+						<up-swiper :list="swiperList">
+							<template v-slot:item="{ item }">
+								<up-image :src="item.image" width="100%" height="160rpx" mode="aspectFill"
+									radius="12" />
 							</template>
-							<template #title>
-								<view class="cell-content">
-									<text class="name">{{ item.name }}</text>
+						</up-swiper>
+					</view>
+
+					<!-- 分类导航 -->
+					<view class="category-nav">
+						<scroll-view scroll-x class="nav-scroll">
+							<view v-for="(item, index) in categories" :key="index" class="nav-item"
+								:class="{ active: currentCategory === index }" @click="switchCategory(index)">
+								{{ item }}
+							</view>
+						</scroll-view>
+					</view>
+
+					<!-- 热门小说推荐 -->
+					<view class="novel-section">
+						<view class="section-header">
+							<text class="title">热门小说</text>
+							<text class="more">更多 ></text>
+						</view>
+						<scroll-view scroll-x class="novel-scroll">
+							<view v-for="(item, index) in hotNovels" :key="index" class="novel-card">
+								<up-image :src="item.cover" width="200rpx" height="280rpx" radius="12" />
+								<text class="novel-title">{{ item.title }}</text>
+								<text class="novel-author">{{ item.author }}</text>
+							</view>
+						</scroll-view>
+					</view>
+
+					<!-- 经典文学 -->
+					<view class="classics-section">
+						<view class="section-header">
+							<text class="title">经典文学</text>
+							<up-tag text="必读" type="warning" plain size="mini" />
+						</view>
+						<view class="classics-grid">
+							<view v-for="(item, index) in classics" :key="index" class="classic-item">
+								<up-image :src="item.cover" width="100%" height="320rpx" radius="12" />
+								<view class="book-info">
+									<text class="book-title">{{ item.title }}</text>
+									<text class="book-desc">{{ item.desc }}</text>
+									<view class="book-meta">
+										<up-rate :value="item.rating" :size="12" readonly />
+										<text class="rating-text">{{ item.rating }}分</text>
+									</view>
 								</view>
-							</template>
-							<template #right-icon>
-								<view class="tag-group">
-									<up-tag :type="item.disabled ? 'error' : 'primary'" size="mini"
-										:text="item.disabled ? '禁用' : '启用'" custom-style="margin-left: 8rpx" />
-									<up-tag v-if="item.is_superuser" type="info" size="mini" text="管理员" plain
-										custom-style="margin-left: 8rpx" />
+							</view>
+						</view>
+					</view>
+
+					<!-- 排行榜 -->
+					<view class="ranking-section">
+						<view class="section-header">
+							<text class="title">本周最热榜单</text>
+						</view>
+						<view class="ranking-list">
+							<view v-for="(item, index) in rankingList" :key="index" class="ranking-item">
+								<text class="rank-num" :class="{ 'top3': index < 3 }">{{ index + 1 }}</text>
+								<up-image :src="item.cover" width="120rpx" height="160rpx" radius="8" />
+								<view class="rank-info">
+									<text class="book-title">{{ item.title }}</text>
+									<text class="book-author">{{ item.author }}</text>
+									<text class="book-hot">{{ item.hot }}人在读</text>
 								</view>
-							</template>
-						</up-cell>
-					</up-list-item>
-				</up-list>
-				<!-- 加载更多 -->
-				<up-loadmore 
-					:status="loadStatus" 
-					:load-text="{ loadmore: '上拉或点击加载更多' }" 
-					@loadmore="loadMore" 
-				/>
-				<!-- 空数据提示 -->
-				<up-empty v-if="pagination.total === 0" mode="data" text="暂无用户数据"></up-empty>
+							</view>
+						</view>
+					</view>
+				</view>
 			</view>
 		</template>
 	</app-layout>
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
-import { onLoad } from '@dcloudio/uni-app';
-import { list_user } from "@/api/apis";
+import { ref } from 'vue'
 
-// 响应式数据
-const loadStatus = ref('loadmore');
-const tableData = ref([]);
-const pageQuery = ref({
-	name: '',
-	offset: 0,
-	limit: 8
-});
-// 分页配置
-const pagination = reactive({
-	total: 0, // 总数据条数
-	hasNext: null, // 是否有下一页
-});
+const swiperList = ref([
+	'/static/banner/banner01.jpg',
+	'/static/banner/banner02.jpg',
+	'/static/banner/banner03.jpg'
+])
 
-// 初始化加载
-onLoad(() => {
-	handleUserList();
-});
+const currentCategory = ref(0)
+const categories = ref(['推荐', '小说', '文学', '青春', '励志', '生活', '经管', '科技'])
 
-// 获取用户列表
-const handleUserList = async () => {
-	loadStatus.value = 'loading';
-	try {
-		const result = await list_user(pageQuery.value);
-		// 确保 API 返回的数据结构正确
-		if (result && result.data.items) {
-			if (pageQuery.value.offset === 0) {
-				tableData.value = result.data.items;
-			} else {
-				tableData.value = [...tableData.value, ...result.data.items];
-			}
-			// 更新分页状态
-			pagination.hasNext = result.data.has_next;
-			pagination.total = result.data.total;
-			loadStatus.value = pagination.hasNext ? 'loadmore' : 'nomore';
-		} else {
-			throw new Error('API 数据结构异常');
-		}
-	} catch (error) {
-		loadStatus.value = 'error';
-		console.error('加载用户列表失败:', error);
+const hotNovels = ref([
+	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1001535109/150.webp', title: '三体', author: '刘慈欣' },
+	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1042581400/150.webp', title: '活着', author: '余华' },
+	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1039864976/150.webp', title: '白夜行', author: '东野圭吾' },
+	// ...更多小说
+])
+
+const classics = ref([
+	{
+		cover: 'https://bookcover.yuewen.com/qdbimg/349573/1043385530/150.webp',
+		title: '百年孤独',
+		desc: '魔幻现实文学',
+		rating: 9.2
+	},
+	{
+		cover: 'https://bookcover.yuewen.com/qdbimg/349573/1040389925/150.webp',
+		title: '红楼梦',
+		desc: '中国古典文学',
+		rating: 9.6
 	}
-};
+])
 
-// 加载更多
-const loadMore = () => {
-	if (pagination.hasNext && loadStatus.value === 'loadmore') {
-		pageQuery.value.offset += pageQuery.value.limit;
-		handleUserList();
-	}
-};
+const rankingList = ref([
+	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1015190643/90.webp', title: '云边有个小卖部', author: '张嘉佳', hot: '12.5万' },
+	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1030657157/90.webp', title: '克拉克公园', author: '史蒂夫', hot: '10.2万' },
+	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1005053098/90.webp', title: '平原上的摩西', author: '双雪涛', hot: '8.9万' },
+])
 
-// 清除搜索框时重置查询条件并重新加载数据
-const handleClearSearch = () => {
-	pageQuery.value.name = '';
-	pageQuery.value.offset = 0;
-	handleUserList();
-};
+const switchCategory = (index) => {
+	currentCategory.value = index
+}
+
+const handleSearch = (value) => {
+	console.log('搜索:', value)
+}
 </script>
 
 <style lang="scss" scoped>
 .home-container {
-	padding: 30rpx;
-	background-color: #f8f8f8;
+	padding: 60rpx 20rpx;
+
+	.scroll-content {
+		padding: 20rpx 24rpx;
+	}
+}
+
+/* 轮播图优化 */
+.swiper-section {
+	margin: 20rpx 0;
+
+	:deep(.up-swiper) {
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+	}
+}
+
+/* 分类导航 */
+.category-nav {
+	margin: 20rpx 0;
+
+	.nav-scroll {
+		white-space: nowrap;
+
+		.nav-item {
+			display: inline-block;
+			padding: 16rpx 30rpx;
+			font-size: 28rpx;
+			color: #666;
+
+			&.active {
+				color: #2979ff;
+				font-weight: 500;
+			}
+		}
+	}
+}
+
+/* 热门小说推荐 */
+.novel-section {
+	margin: 30rpx 0;
+
+	.novel-scroll {
+		white-space: nowrap;
+		padding: 20rpx 0;
+
+		.novel-card {
+			display: inline-block;
+			margin-right: 24rpx;
+			width: 200rpx;
+
+			.novel-title {
+				font-size: 26rpx;
+				color: #333;
+				margin-top: 12rpx;
+			}
+
+			.novel-author {
+				font-size: 22rpx;
+				color: #999;
+			}
+		}
+	}
+}
+
+/* 经典文学 */
+.classics-section {
+	margin: 30rpx 0;
+
+	.classics-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 24rpx;
+
+		.classic-item {
+			background: #fff;
+			border-radius: 12rpx;
+			overflow: hidden;
+
+			.book-info {
+				padding: 16rpx;
+
+				.book-title {
+					font-size: 28rpx;
+					font-weight: 500;
+				}
+
+				.book-desc {
+					font-size: 24rpx;
+					color: #666;
+					margin: 8rpx 0;
+				}
+			}
+		}
+	}
+}
+
+/* 排行榜 */
+.ranking-section {
+	margin: 30rpx 0;
+
+	.ranking-item {
+		display: flex;
+		align-items: center;
+		padding: 20rpx 0;
+		border-bottom: 1rpx solid #eee;
+
+		.rank-num {
+			width: 40rpx;
+			font-size: 32rpx;
+			font-weight: bold;
+			color: #999;
+
+			&.top3 {
+				color: #ff6b6b;
+			}
+		}
+
+		.rank-info {
+			margin-left: 20rpx;
+
+			.book-title {
+				font-size: 28rpx;
+				color: #333;
+			}
+
+			.book-author {
+				font-size: 24rpx;
+				color: #666;
+			}
+
+			.book-hot {
+				font-size: 22rpx;
+				color: #ff6b6b;
+			}
+		}
+	}
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20rpx;
+
+	.title {
+		font-size: 32rpx;
+		font-weight: 500;
+		color: #333;
+	}
+
+	.more {
+		font-size: 24rpx;
+		color: #999;
+	}
 }
 </style>

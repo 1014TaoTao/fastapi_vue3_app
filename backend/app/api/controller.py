@@ -77,7 +77,7 @@ async def login(
             access_token=access_token,
             token_type=settings.TOKEN_TYPE,
             expires_in=access_expires.total_seconds(),
-            user_id=existing_obj.id,
+            user_info=UserOutSchema.model_validate(existing_obj).model_dump(),
         )
 
         logger.info(f"用户{existing_obj.username}登录成功")
@@ -135,7 +135,7 @@ async def register(
 ) -> JSONResponse:
     """注册用户"""
     try:
-        if not payload.name or payload.username or payload.password:
+        if not payload.name and payload.username and payload.password:
             logger.warning("注册用户失败，参数不完整")
             return ErrorResponse(message="注册失败，必填项不可以为空")
         existing_obj: User | None = db.exec(
@@ -186,8 +186,7 @@ async def logout(
         logger.error(f"系统异常: {e}")
         raise ExceptResponse(message=f"系统异常: {e}")
 
-
-@router.put(path='/upload', summary="上传文件", dependencies=[Depends(dependency=get_current_user)])
+@router.post(path='/upload', summary="上传文件", dependencies=[Depends(dependency=get_current_user)])
 async def upload_file(
     request: Request,
     file: UploadFile = File(...)
@@ -196,14 +195,14 @@ async def upload_file(
     try:
         if not file.filename or not file.content_type:
             logger.warning(f"文件不支持")
-            return ErrorResponse(message="文件不支持")
+            return ErrorResponse(message=f"{file.filename} 文件不支持")
         file_extension = mimetypes.guess_extension(file.content_type)
         if not file_extension in settings.ALLOWED_EXTENSIONS:
             logger.warning(f"文件 {file.filename} 格式不支持上传")
-            return ErrorResponse(message="文件不允许上传")
+            return ErrorResponse(message=f"{file.filename} 文件不允许上传")
         if file.size and file.size > settings.MAX_FILE_SIZE:
             logger.warning(f"文件 {file.filename} 大小不可以超过10MB")
-            return ErrorResponse(message="文件大小超过限制10MB")
+            return ErrorResponse(message=f"{file.filename} 文件大小超过限制10MB")
         
         # 构建文件名称
         name, ext = file.filename.rsplit(".", 1)
@@ -242,7 +241,8 @@ async def list_user(
             sql = sql.where(and_(User.name.contains(name)))
 
         # 获取总数
-        total: int | None = db.exec(select(func.count()).select_from(sql)).first()
+        total: int | None = db.exec(select(func.count()).select_from(User)).one()
+        
         if total is None:
             total = 0
 
@@ -341,8 +341,7 @@ async def update_user(
         if existing_obj.is_superuser:
             logger.warning("超级管理员不允许修改")
             return ErrorResponse(message="超级管理员不允许修改")
-        if obj.password:
-            obj.password = set_password_hash(password=obj.password)
+        
         update_data_dict = obj.model_dump(exclude_unset=True)
         existing_obj.sqlmodel_update(update_data_dict)
         existing_obj.updated_at = datetime.now()

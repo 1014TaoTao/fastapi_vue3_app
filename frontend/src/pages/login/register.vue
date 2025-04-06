@@ -1,5 +1,5 @@
 <template>
-    <view class="forgot-container">
+    <view class="register-container">
         
         <up-form ref="form" :model="formData" :rules="rules" class="auth-form">
             <!-- 用户名 -->
@@ -18,10 +18,9 @@
                     @keyup.enter="handleSubmit" />
             </up-form-item>
 
-            <!-- 登录按钮 -->
-            <up-button class="btn" type="primary" text="确认" :loading="isLoading" @click="handleSubmit"/>
+            <!-- 确认按钮 -->
+            <up-button class="btn" type="primary" text="确认" :loading="loading" @click="handleSubmit"/>
             
-            <up-text type="info" @click="handleGo" align="center" lineHeight="40" text="返回登录" />
         </up-form>
     </view>
 </template>
@@ -32,7 +31,7 @@ import { onReady } from '@dcloudio/uni-app';
 import { register } from '@/api/apis';
 
 const form = ref(null);
-const isLoading = ref(false);
+const loading = ref(false);
 
 const formData = ref({
     name: '',
@@ -42,9 +41,9 @@ const formData = ref({
 
 // 表单验证规则
 const rules = {
-    name: { required: true, message: '请输入用户名' },
-    username: { required: true, message: '请输入账号' },
-    password: { required: true, message: '请输入密码' }
+    name: { required: true, message: '请输入用户名',trigger: ['change','blur'] },
+    username: { required: true, message: '请输入账号',trigger: ['change','blur'] },
+    password: { required: true, message: '请输入密码',trigger: ['change','blur'] }
 }
 
 onReady(() => {
@@ -53,29 +52,23 @@ onReady(() => {
 
 
 const handleSubmit = async () => {
-    try {
-        await form.value.validate();
-        isLoading.value = true
+    await form.value.validate();
+    loading.value = true
 
-        const result = await register(formData.value);
-        console.log('注册用户成功', result.data);
+    const result = await register(formData.value);
+    console.log('注册用户成功', result.data);
 
-        // 跳转到登录页面
-        uni.navigateTo({ url: '/pages/login/login' });
-    } catch (error) {
-        console.error('注册用户失败', error);
-    } finally {
-        isLoading.value = false
-    }
+    // 跳转到登录页面
+    uni.navigateBack();
+
+    loading.value = false
+
 };
 
-function handleGo() {
-    uni.navigateTo({ url: '/pages/login/login' }); 
-};
 </script>
 
 <style lang="scss" scoped>
-.forgot-container {
+.register-container {
     padding: 60rpx 60rpx;
 
     .btn {

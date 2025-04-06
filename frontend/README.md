@@ -7,6 +7,7 @@ frontend/
 │  ├─ components        # 组件目录
 │  ├─ pages             # 页面目录
 │  ├─ static            # 静态资源目录
+│  ├─ stores            # 状态管理目录
 │  ├─ utils             # 工具目录
 │  ├─ App.vue           # 主组件
 │  ├─ main.ts           # 入口文件
