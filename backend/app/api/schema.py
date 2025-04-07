@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 from typing import Any, Union, Annotated, Union
@@ -58,8 +60,6 @@ class JWTPayloadSchema(SQLModel):
     exp: Union[datetime, int] = Field(default=..., description="过期时间")
 
 
-
-
 class ForgotPasswordSchema(SQLModel):
     """忘记密码模型"""
 
@@ -88,7 +88,7 @@ class UserSchema(SQLModel):
     name: str | None = Field(default=None, description="用户名")
     username: str | None = Field(default=None, description="登录账号")
     password: str = Field(default=None, max_length=255, description="密码")
-    disabled: bool | None = Field(default=False, description="是否禁用")
+    available: bool| None = Field(default=True, description="是否激活(True:启用 False:禁用)")
     avatar: str | None = Field(default=None, description="头像")
     description: str | None = Field(default=None, description="用户描述信息")
 

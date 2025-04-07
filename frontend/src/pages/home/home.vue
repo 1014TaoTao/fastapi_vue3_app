@@ -40,31 +40,10 @@
 						</scroll-view>
 					</view>
 
-					<!-- 经典文学 -->
-					<view class="classics-section">
-						<view class="section-header">
-							<text class="title">经典文学</text>
-							<up-tag text="必读" type="warning" plain size="mini" />
-						</view>
-						<view class="classics-grid">
-							<view v-for="(item, index) in classics" :key="index" class="classic-item">
-								<up-image :src="item.cover" width="100%" height="320rpx" radius="12" />
-								<view class="book-info">
-									<text class="book-title">{{ item.title }}</text>
-									<text class="book-desc">{{ item.desc }}</text>
-									<view class="book-meta">
-										<up-rate :value="item.rating" :size="12" readonly />
-										<text class="rating-text">{{ item.rating }}分</text>
-									</view>
-								</view>
-							</view>
-						</view>
-					</view>
-
 					<!-- 排行榜 -->
 					<view class="ranking-section">
 						<view class="section-header">
-							<text class="title">本周最热榜单</text>
+							<text class="title">本周热榜</text>
 						</view>
 						<view class="ranking-list">
 							<view v-for="(item, index) in rankingList" :key="index" class="ranking-item">
@@ -103,20 +82,6 @@ const hotNovels = ref([
 	// ...更多小说
 ])
 
-const classics = ref([
-	{
-		cover: 'https://bookcover.yuewen.com/qdbimg/349573/1043385530/150.webp',
-		title: '百年孤独',
-		desc: '魔幻现实文学',
-		rating: 9.2
-	},
-	{
-		cover: 'https://bookcover.yuewen.com/qdbimg/349573/1040389925/150.webp',
-		title: '红楼梦',
-		desc: '中国古典文学',
-		rating: 9.6
-	}
-])
 
 const rankingList = ref([
 	{ cover: 'https://bookcover.yuewen.com/qdbimg/349573/1015190643/90.webp', title: '云边有个小卖部', author: '张嘉佳', hot: '12.5万' },
@@ -194,38 +159,6 @@ const handleSearch = (value) => {
 			.novel-author {
 				font-size: 22rpx;
 				color: #999;
-			}
-		}
-	}
-}
-
-/* 经典文学 */
-.classics-section {
-	margin: 30rpx 0;
-
-	.classics-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 24rpx;
-
-		.classic-item {
-			background: #fff;
-			border-radius: 12rpx;
-			overflow: hidden;
-
-			.book-info {
-				padding: 16rpx;
-
-				.book-title {
-					font-size: 28rpx;
-					font-weight: 500;
-				}
-
-				.book-desc {
-					font-size: 24rpx;
-					color: #666;
-					margin: 8rpx 0;
-				}
 			}
 		}
 	}

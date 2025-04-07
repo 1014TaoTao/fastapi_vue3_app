@@ -24,7 +24,7 @@
 
 ### 项目概述
 
-FastAPI-Vue3-App 是全栈开源项目，旨在助开发者快速搭建移动、小程序和 H5 应用。后端采用 FastAPI 异步编程提升并发，用 SQLModel 简化数据库操作，以 Alembic 管理版本，借 JWT 实现身份验证与授权；前端运用 Vue3 构建界面，结合 Vite 实现快速构建，借助 UniApp 跨平台开发，搭配 uView-plus 丰富组件。提供一站式开发方案，高效便捷。
+FastAPI-Vue3-App 是全栈开源项目，旨在助开发者快速搭建移动、小程序和 H5 应用。后端采用 FastAPI + SQLModel + Alembic + JWT 异步编程提升并发，简化数据库操作，实现身份验证与授权，并进行管理版本；前端采用 Vue3 + Vite5 + Pinia + UniApp + uView-plus 实现快速构建，跨平台开发。提供一站式开发方案，高效便捷。
 
 > 后端技术栈：
 
@@ -37,6 +37,7 @@ FastAPI-Vue3-App 是全栈开源项目，旨在助开发者快速搭建移动、
 
 - **Vue3**: 渐进式JavaScript框架，用于构建用户界面。
 - **Vite**: 快速的前端构建工具，支持热重载。
+- **Pinia**: 状态管理工具，用于管理前端状态。
 - **UniApp**: 跨平台应用开发框架，支持多端开发。
 - **uView-plus**: 基于Vue3的UI组件库，提供丰富的组件。
 
@@ -64,7 +65,7 @@ fastapi_vue3_app/
         <td><img src="./frontend/public/登录.jpeg"/>登陆</td>
         <td><img src="./frontend/public/注册.png"/>注册</td>
         <td><img src="./frontend/public/忘记密码.png"/>忘记密码</td>
-        <td><img src="./frontend/public/首页.jpeg"/>首页</td>
+        <td><img src="./frontend/public/首页.png"/>首页</td>
    </tr>
    <tr>
         <td><img src="./frontend/public/工作台.png"/>工作台</td>

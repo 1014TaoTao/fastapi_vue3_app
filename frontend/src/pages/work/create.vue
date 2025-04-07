@@ -29,8 +29,8 @@
             </up-form-item>
 
             <!-- 状态 -->
-            <up-form-item label="状态:" prop="disabled">
-                <up-switch v-model="formData.disabled" activeColor="#f56c6c"></up-switch>
+            <up-form-item label="状态:" prop="available">
+                <up-switch v-model="formData.available"></up-switch>
             </up-form-item>
 
 
@@ -58,7 +58,7 @@ const formData = ref({
     name: "",
     username: "",
     password: "",
-    disabled: false,
+    available: true,
     avatar: "",
     description: "",
 });
@@ -71,7 +71,7 @@ const rules = {
     name: { required: true, message: '请输入用户名', trigger: ['change','blur'] },
     username: { required: true, message: '请输入账号', trigger: ['change','blur'] },
     password: { required: true, message: '请输入密码', trigger: ['change','blur'] },
-    disabled: { required: true, message: '请选择状态'},
+    available: { required: true, message: '请选择状态'},
     description: { required: false },
     avatar: { required: false }
 }

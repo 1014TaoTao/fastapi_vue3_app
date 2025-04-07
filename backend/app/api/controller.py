@@ -53,7 +53,7 @@ async def login(
         if not existing_obj:
             logger.warning(f"用户{login_form.username}不存在")
             return ErrorResponse(message="用户不存在")
-        if existing_obj.disabled:
+        if not existing_obj.available:
             logger.warning(f"用户{login_form.username}已禁用")
             return ErrorResponse(message="用户已禁用")
         if not verify_password(
@@ -103,7 +103,7 @@ async def forgot_password(
         if not user:
             logger.warning(f"账号{payload.username}不存在")
             return ErrorResponse(message="用户不存在")
-        if user.disabled:
+        if not user.available:
             logger.warning(f"账号{payload.username}已禁用")
             return ErrorResponse(message="用户已禁用")
         if not verify_password(
@@ -173,7 +173,7 @@ async def logout(
         if not existing_obj:
             logger.warning(f"用户{username}不存在")
             return ErrorResponse(message="用户不存在")
-        if existing_obj.disabled:
+        if not existing_obj.available:
             logger.warning(f"用户{username}已禁用")
             return ErrorResponse(message="用户已禁用")
 

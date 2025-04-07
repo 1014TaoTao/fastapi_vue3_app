@@ -29,8 +29,8 @@ async def get_current_user(
         ).first()
         if not user:
             raise ExceptResponse(message="用户不存在", status_code=401)
-        if user.disabled:
-            raise ExceptResponse(message="用户已被停用", status_code=401)
+        if not user.available:
+            raise ExceptResponse(message="用户已被禁用", status_code=401)
 
         # 设置请求上下文
         request.scope["user_id"] = user.id

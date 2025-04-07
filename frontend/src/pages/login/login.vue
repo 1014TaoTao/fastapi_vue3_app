@@ -1,5 +1,8 @@
 <template>
     <view class="login-container">
+        <view>
+            
+        </view>
         <!-- 登录表单 -->
         <up-image class="logo" :src="LOGO_PATH" shape="circle" width="100" height="100" mode="aspectFit" />
         <up-text class="logo-text" :bold="true" align="center" size="24" lineHeight="40" text="用户管理系统" />

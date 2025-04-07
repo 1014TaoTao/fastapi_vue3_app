@@ -39,8 +39,8 @@
 							</template>
 							<template #label>
 								<view class="tag-group">
-										<up-tag :type="item.disabled ? 'warning' : 'success'" size="mini"
-											:text="item.disabled ? '禁用' : '启用'" custom-style="margin-left: 8rpx" plain plainFill />
+										<up-tag :type="item.available ? 'success' : 'warning'" size="mini"
+											:text="item.available ? '启用' : '禁用'" custom-style="margin-left: 8rpx" plain plainFill />
 										<up-tag v-if="item.is_superuser" type="info" size="mini" text="管理员" plain plainFill
 											custom-style="margin-left: 8rpx" />
 									</view>

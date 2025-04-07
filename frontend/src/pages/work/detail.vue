@@ -13,7 +13,7 @@
             <up-cell title="账号" :value="formData.username" :border="true"></up-cell>
             <up-cell title="状态">
                 <template #value>
-                    <up-tag :text="formData.disabled ? '禁用' : '启用'" :type="formData.disabled ? 'warning' : 'success'" plain plainFill></up-tag>
+                    <up-tag :text="formData.available ? '启用' : '禁用'" :type="formData.available ? 'success' : 'warning'" plain plainFill></up-tag>
                 </template>
             </up-cell>
             <up-cell title="类型">
@@ -39,7 +39,7 @@ const formData = ref({
     name: "",
     username: "",
     password: "",
-    disabled: false,
+    available: true,
     is_superuser: false,
     avatar: "",
     description: "",

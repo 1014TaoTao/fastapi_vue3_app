@@ -24,7 +24,7 @@ English | [Chinese](./README.md)
 
 ### Project Overview
 
-FastAPI-Vue3-App is a full-stack open-source project designed to assist developers in quickly building mobile, mini-program, and H5 applications. The backend uses FastAPI for asynchronous programming to enhance the application's concurrent processing capabilities, SQLModel to simplify database operations, Alembic to manage database versions, and JWT for authentication and authorization. The frontend utilizes Vue3 to build user interfaces, combines with Vite for rapid construction, leverages UniApp for cross-platform development, and pairs with uView-plus to enrich components. It provides a one-stop development solution, which is efficient and convenient.
+FastAPI-Vue3-App is a full-stack open-source project aimed at helping developers quickly build mobile, mini-program, and H5 applications. The backend uses FastAPI + SQLModel + Alembic + JWT asynchronous programming to improve concurrency, simplify database operations, implement authentication and authorization, and manage versions. The frontend adopts Vue3 + Vite5 + Pinia + UniApp + uView-plus to achieve rapid construction and cross-platform development. It provides an all-in-one development solution, being efficient and convenient.
 
 > Backend Technology Stack:
 
@@ -37,6 +37,7 @@ FastAPI-Vue3-App is a full-stack open-source project designed to assist develope
 
 - **Vue3**: A progressive JavaScript framework for building user interfaces.
 - **Vite**: A fast frontend build tool that supports hot reloading.
+- **Pinia**: A state management library for Vue3 that provides a rich set of components.
 - **UniApp**: A cross-platform application development framework that supports multi-terminal development.
 - **uView-plus**: A Vue3-based UI component library that provides a rich set of components.
 
@@ -61,15 +62,21 @@ fastapi_vue3_app/
 
 <table>
     <tr>
-        <td><img src="./frontend/public/登录.jpeg"/>登陆</td>
-        <td><img src="./frontend/public/注册.jpeg"/>注册</td>
+        <td><img src="./frontend/public/登录.jpeg"/>login</td>
+        <td><img src="./frontend/public/注册.png"/>register</td>
+        <td><img src="./frontend/public/忘记密码.png"/>forgot_password</td>
+        <td><img src="./frontend/public/首页.png"/>home</td>
    </tr>
    <tr>
-        <td><img src="./frontend/public/忘记密码.jpeg"/>忘记密码</td>
-        <td><img src="./frontend/public/首页.jpeg"/>首页</td>
+        <td><img src="./frontend/public/工作台.png"/>work</td>
+        <td><img src="./frontend/public/新增用户.png"/>createUser</td>
+        <td><img src="./frontend/public/更新用户.png"/>updateUser</td>
+        <td><img src="./frontend/public/用户详情.png"/>detailUser</td>
    </tr>
     <tr>
-        <td><img src="./frontend/public/个人中心.jpeg"/>个人中心</td>
+        <td><img src="./frontend/public/个人中心.png"/>mine</td>
+        <td><img src="./frontend/public/删除用户.png"/>deleteUser</td>
+        <td><img src="./frontend/public/联系我们.png"/>phoneMe</td>
    </tr>
 </table>
 

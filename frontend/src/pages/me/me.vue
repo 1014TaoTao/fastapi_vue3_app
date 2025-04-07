@@ -90,7 +90,7 @@ const formData = ref({
 	name: "",
 	username: "",
 	password: "",
-	disabled: null,
+	available: null,
 	is_superuser: null,
 	avatar: "",
 	description: "",
