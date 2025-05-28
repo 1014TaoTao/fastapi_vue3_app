@@ -4,8 +4,9 @@ import json
 import mimetypes
 from pathlib import Path
 import aiofiles
-from fastapi import File, Query, Request, APIRouter, Depends, Path, Body, UploadFile
+from fastapi import File, Query, Request, APIRouter, Depends, Path, UploadFile
 from fastapi.responses import JSONResponse
+from fastapi.templating import Jinja2Templates
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, desc, func, select, asc, and_
 from typing import Dict, Union
@@ -37,6 +38,13 @@ from app.core.database import get_db
 
 
 router: APIRouter = APIRouter(prefix="/api")
+templates = Jinja2Templates(directory="templates")
+
+@router.get("/", summary="首页页面")
+async def home(
+    request: Request
+):
+    return templates.TemplateResponse(request=request, name="home.html")
 
 @router.post(path="/login", summary="登录", response_model=JWTOutSchema)
 async def login(

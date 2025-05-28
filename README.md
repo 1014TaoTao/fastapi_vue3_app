@@ -77,6 +77,7 @@ fastapi_vue3_app/
         <td><img src="./frontend/public/个人中心.png"/>个人中心</td>
         <td><img src="./frontend/public/删除用户.png"/>个人中心</td>
         <td><img src="./frontend/public/联系我们.png"/>联系我们</td>
+        <td><img src="./frontend/public/home.png"/>jinja2后端模版</td>
    </tr>
 </table>
 

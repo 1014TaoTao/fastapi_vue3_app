@@ -77,6 +77,7 @@ fastapi_vue3_app/
         <td><img src="./frontend/public/个人中心.png"/>mine</td>
         <td><img src="./frontend/public/删除用户.png"/>deleteUser</td>
         <td><img src="./frontend/public/联系我们.png"/>phoneMe</td>
+        <td><img src="./frontend/public/home.png"/>jinja2 home</td>
    </tr>
 </table>
 
